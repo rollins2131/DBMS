@@ -1,137 +1,146 @@
-# 🏦 Bank Management System — DBMS Project
+# 🏦 Bank Management System — DBMSmini
 
-This is a **Bank Management System** built using **MySQL (Database)** and **Streamlit (UI)**.  
-It demonstrates **Triggers, Stored Procedures, Functions, CRUD operations**, and **role-based access control** through Admin, Employee, and Customer logins.
+A **Database Management Mini Project** simulating a **banking system**, built using:
+- 🧰 **MySQL** — Database
+- 🐍 **Python** — Backend
+- 🖥️ **Streamlit** — User Interface
+
+This project covers real banking operations like account creation, transactions, transfers, loans, audit logging, and role-based access.
 
 ---
 
-## 📂 Project Structure
+## 📁 Project Structure
 
-.
+DBMSmini/
+├── app.py # Streamlit application
 ├── .env # Environment variables (DB credentials)
-├── app.py # Main Streamlit application
 ├── requirements.txt # Python dependencies
+├── DBMSmini.sql # ✅ Database schema and data dump
 └── README.md # Project documentation
 
-yaml
+markdown
 Copy code
 
 ---
 
-## 🛢️ Database Schema
+## 🧱 Database (DBMSmini.sql)
 
-- **CUSTOMER** — Stores customer information (CIF, name, branch, etc.)  
-- **EMPLOYEE** — Stores employee details (PF No, designation, etc.)  
-- **ACCOUNTS** — Stores account details with balance  
-- **TRANSACTION** — Records deposits/withdrawals  
-- **TRANSFERS** — Records transfers between accounts  
-- **LOANS** — Handles loan applications and approvals  
-- **AUDIT_LOGS** — Logs every critical action for tracking
+The `.sql` file includes:
+- **Tables**
+  - `CUSTOMER` — customer details  
+  - `EMPLOYEE` — employee info and roles  
+  - `ACCOUNTS` — account details with balance  
+  - `TRANSACTION` — deposit and withdrawal logs  
+  - `TRANSFERS` — account-to-account transfers  
+  - `LOANS` — loan applications  
+  - `AUDIT_LOGS` — transaction & approval logs
 
----
+- **Triggers**
+  - Automatically update account balance after a transaction.
+  - Insert log entry into `AUDIT_LOGS`.
 
-## 🧰 Key Features
+- **Stored Procedure**
+  - `sp_approve_loan` — approves pending loans and logs the action.
 
-- 👤 **Role-based login**: Admin, Employee, Customer  
-- 🏦 **Account management**: Open accounts, view balances  
-- 💰 **Transactions**: Deposit and withdraw  
-- 🔄 **Transfers**: Between accounts  
-- 📝 **Loans**: Apply and approve loans  
-- 🧾 **Audit Logs**: All actions automatically logged
+- **Function**
+  - `fn_calculate_interest` — calculates interest based on input.
 
----
-
-## 🧠 Database Logic
-
-- **Trigger**:  
-  - Automatically updates balance in ACCOUNTS and inserts into AUDIT_LOGS after every transaction.
-
-- **Stored Procedure**:  
-  - `sp_approve_loan` — Approves loans and records approval in AUDIT_LOGS.
-
-- **Function**:  
-  - `fn_calculate_interest` — Calculates interest for given inputs.
-
-- **Queries**:
-  - Join: Customer–Account mapping  
-  - Nested: High-value customers (balance > 50,000)  
-  - Aggregate: Total deposits per account
+- **Queries**
+  - Joins, nested queries, and aggregate queries implemented for reporting.
 
 ---
 
-## 🔐 Roles and Privileges
+## ⚙️ Setting Up the Database
 
-- **Admin (Manager)**  
-  - Full access (Customers, Employees, Accounts, Transactions, Transfers, Loans, Reports, Audit Logs)
+### 1. Open MySQL and create database
+```sql
+CREATE DATABASE mybank;
+USE mybank;
+2. Import the SQL file
+Option 1 — Terminal:
+bash
+Copy code
+mysql -u root -p mybank < DBMSmini.sql
+Option 2 — MySQL Workbench:
+Server → Data Import
 
-- **Employee**  
-  - Accounts, Transactions, Transfers, Loans, Reports
+Select Import from Self-Contained File
 
-- **Customer**  
-  - View only their own accounts and reports
+Choose DBMSmini.sql
 
----
+Start Import
 
-## ⚡ Setup Instructions
+✅ This will create all tables, triggers, stored procedures, and functions.
 
-### 1. Clone the repository
-```bash
-git clone https://github.com/yourusername/DBMS.git
-cd DBMS
-2. Create and activate virtual environment
+🧪 Test Login Credentials
+Role	ID	Password	Description
+Admin	E001	1234	Manager role
+Employee	E002	abcd	Employee role
+Customer	C001	1234	Customer account
+
+🚀 Running the Streamlit App
+1. Create Virtual Environment
 bash
 Copy code
 python -m venv venv
-venv\Scripts\activate      # For Windows
-source venv/bin/activate   # For Mac/Linux
-3. Install dependencies
+venv\Scripts\activate       # Windows
+# or
+source venv/bin/activate    # Mac/Linux
+2. Install Dependencies
 bash
 Copy code
 pip install -r requirements.txt
-4. Set up .env file
-ini
+3. Set up .env
+env
 Copy code
 DB_HOST=localhost
 DB_USER=root
-DB_PASS=1234
+DB_PASS=yourpassword
 DB_NAME=mybank
-5. Run the Streamlit app
+4. Run the App
 bash
 Copy code
 streamlit run app.py
-6. Access the UI
-Visit http://localhost:8501 in your browser.
+Then open http://localhost:8501 in your browser.
 
-🧪 Test Users
-Role	ID	Password	Description
-Admin	E001	1234	Manager role
-Employee	E002	abcd	Normal employee
-Customer	C001	1234	Customer role
+🧠 SQL Concepts Demonstrated
+✅ Triggers — Auto update balance and insert into audit logs
 
-🏁 Example SQL Commands
-Insert Employee
-sql
-Copy code
-INSERT INTO EMPLOYEE VALUES
-('E001','John Doe','Manager','1234','2022-01-10','Bangalore');
-Insert Transaction (UI triggers this)
+✅ Stored Procedure — Loan approval process
+
+✅ Functions — Interest calculation
+
+✅ Joins — Customer–Account relations
+
+✅ Nested Queries — Filtering high-value customers
+
+✅ Aggregate Queries — Summarizing deposits
+
+✅ Role-based Access Control
+
+📝 User Roles
+Role	Privileges
+Admin	Full CRUD on customers, employees, accounts, loans, audit
+Employee	Accounts, transactions, transfers, loans
+Customer	View own accounts, check balance, reports
+
+🧾 Example SQL Commands
+Deposit Transaction
+
 sql
 Copy code
 INSERT INTO TRANSACTION (transactionid, accno, transactiontype, amount, makerid)
 VALUES ('UUID', 'A001', 'DEPOSIT', 5000, 'E001');
-Trigger handles:
-Balance update in ACCOUNTS
+Trigger updates balance + adds to audit log automatically.
 
-Log entry in AUDIT_LOGS
+Approve Loan
 
-🏅 Project Demonstration
-✅ CRUD Operations on all tables
+sql
+Copy code
+CALL sp_approve_loan('L001', 'E001');
+🛡️ Security Notes
+Do not commit .env with real passwords.
 
-✅ Triggers, Stored Procedures, Functions
+.env should be listed in .gitignore.
 
-✅ Reports: Join, Nested, Aggregate
-
-✅ GUI Integration with Streamlit
-
-✅ Role-based Access Control
-
+The SQL file can be kept for easy setup — but remove sensitive data if pushing to public repo.
