@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  # MySQL Database Service
+  mysql:
+    image: mysql:8.0
+    container_name: financehub-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: mybank
+      MYSQL_USER: bankuser
+      MYSQL_PASSWORD: bankpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./DBMSmini.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - financehub-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p1234"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Streamlit Application Service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: financehub-app
+    restart: unless-stopped
+    environment:
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASS: 1234
+      DB_NAME: mybank
+    ports:
+      - "8501:8501"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - financehub-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  financehub-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local
